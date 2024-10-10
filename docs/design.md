@@ -15,7 +15,7 @@ be:
   required trust anchors?
 - How can we detect if non-approved trust anchors are used?
 - How can we prevent the usage of certain trust anchors in the presence of
-- others (mutual exclusivity)?
+  others (mutual exclusivity)?
 
 To answer these questions for any given SOPS file, the
 `sops-compliance-checker` needs to be flexible enough to process a set of
@@ -54,8 +54,8 @@ The rule engine needs to support the following functionality:
 - Reject excess trust anchors (not matched by any rule):
   - **Example**: Developers should not be allowed to use additional encryption
     keys apart from the keys managed by the company within any given SOPS file.
-    The protects against employees still retaining access to secrets after they
-    left the company.
+    This protects against employees still retaining access to secrets after
+    they left the company.
 
 It must be possible to nest these rule arbitrarily deep to allow building
 complex match pattern with different dependencies between each other.
