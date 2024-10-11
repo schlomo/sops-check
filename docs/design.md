@@ -149,6 +149,22 @@ rules:
               - match: arn:aws:kms:eu-west-1:123456789012:alias/staging-cicd
 ```
 
+## Non-Goals
+
+The compliance checker only looks at the trust anchors found in the SOPS
+metadata without actually having access to the encryption keys. Because of
+that:
+
+- It does not decrypt the contents of the SOPS files.
+- It does not check for data corruption within SOPS files. SOPS already does
+  this via a MAC signature.
+- It does not assess the security of the trust anchors in use. Checking if the
+  encryption keys of any of the referenced trust anchors were leaked to the
+  internet is out of scope.
+- It does not scan the directory tree for plaintext secrets. There are plenty
+  of other tools out there that already do this, such as [Gitleaks][gitleaks],
+  [Secretlint][secretlint] or [TruffleHog][trufflehog].
+
 ## Other considerations
 
 There are some potential optional features that could be supported by the compliance checker:
@@ -164,5 +180,8 @@ There are some potential optional features that could be supported by the compli
 - **Matching n-of**: Support for matching lists of `m` trust anchors where `n`
   must match the rules, with `n <= m`.
 
-[sops]: https://github.com/getsops/sops
+[gitleaks]: https://github.com/gitleaks/gitleaks
 [jsonschema-spec]: https://json-schema.org/draft/2020-12/json-schema-core
+[secretlint]: https://github.com/secretlint/secretlint
+[sops]: https://github.com/getsops/sops
+[trufflehog]: https://github.com/trufflesecurity/trufflehog
