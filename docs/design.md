@@ -149,6 +149,25 @@ rules:
               - match: arn:aws:kms:eu-west-1:123456789012:alias/staging-cicd
 ```
 
+## Output
+
+To be as helpful as possible to user, the output should make it clear what the
+problem is. It should include information about:
+
+- The SOPS file that failed the compliance check.
+- Display information about expected, but missing trust anchors ("any of" / "all of").
+- Display information about conflicting trust anchors ("one of").
+- Display information about explicitly denied trust anchors ("not").
+- Display the trust anchors that did not match any rule.
+- Ideally, include context about the line and column in the SOPS file where the
+  check failed.
+- Optionally provide guidance how to make the file compliant with the rules.
+
+### Output formats
+
+The compliance checker should support at least textual output intended for
+display to users as well as JSON output to make results machine readable.
+
 ## Non-Goals
 
 The compliance checker only looks at the trust anchors found in the SOPS
