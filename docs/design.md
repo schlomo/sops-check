@@ -8,7 +8,7 @@ with [SOPS][sops] and the concepts that it uses.
 
 SOPS supports encrypting files using one or more trust anchors. Especially in
 enterprise contexts, it is important to enforce some rules around the trust
-anchors that are in use. Some questions that are looking for an answer could
+anchors that are in use. Some questions that to be answered could
 be:
 
 - How can we ensure that any given SOPS file is encrypted using a set of
@@ -27,12 +27,13 @@ The high-level functionality of the compliance checker can be summarized like
 this:
 
 - Recursively scan a directory tree (such as a Git repository) for SOPS
-  encrypted files. It should support all file formats supported by SOPS itself.
-- Extract trust anchors from SOPS encrypted files in order to match them
-  against a set of user-defined rules.
+  encrypted files.
+- It should support all file formats supported by SOPS itself.
+- Extract trust anchors from SOPS encrypted files to match them against a set
+  of user-defined rules.
 - Report check results back to the user.
 
-The rule engine needs to support the following functionality:
+The rules engine needs to support the following functionality:
 
 - Matching of a trust anchor ("match")
   - **Example**: The trust anchor is an AWS KMS Key with the ARN
@@ -166,7 +167,7 @@ problem is. It should include information about:
 ### Output formats
 
 The compliance checker should support at least textual output intended for
-display to users as well as JSON output to make results machine readable.
+display to users as well as machine readable output in the [SARIF format][sarif].
 
 ## Non-Goals
 
@@ -186,7 +187,8 @@ that:
 
 ## Other considerations
 
-There are some potential optional features that could be supported by the compliance checker:
+There are some potential optional features that could be supported by the
+compliance checker:
 
 - **Warning mode**: An option to mark certain rules as soft-errors, which emit
   a warning instead of failing the check.
@@ -201,6 +203,7 @@ There are some potential optional features that could be supported by the compli
 
 [gitleaks]: https://github.com/gitleaks/gitleaks
 [jsonschema-spec]: https://json-schema.org/draft/2020-12/json-schema-core
+[sarif]: https://sarifweb.azurewebsites.net/
 [secretlint]: https://github.com/secretlint/secretlint
 [sops]: https://github.com/getsops/sops
 [trufflehog]: https://github.com/trufflesecurity/trufflehog
