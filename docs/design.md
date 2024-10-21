@@ -1,10 +1,11 @@
 # Design
 
-This document explains the purpose of the sops-compliance-checker and also
-contains all the details about design decisions we took. It assumes familarity
-with [SOPS][sops] and the concepts that it uses.
+This document explains the purpose of the `sops-compliance-checker` and also
+documents the functional and non-functional requirements we have, as well as
+the details about design decisions we took. It assumes familarity with
+[SOPS][sops] and the concepts that it uses.
 
-## Problem Statement
+## Background
 
 SOPS supports encrypting files using one or more trust anchors. Especially in
 enterprise contexts, it is important to enforce some rules around the trust
@@ -66,10 +67,13 @@ complex match pattern with different dependencies between each other.
 - The compliance checker should be packaged as a container image for easy
   integration into CI/CD pipelines.
 
-## Data Model
+## Design Choices
+
+### Data Model
 
 Based on the functional requirements, the data model for the rule configuration
-could look like this, expressed as Go code:
+could look like this (expressed as Go code, the language used for the actual
+implementation might differ):
 
 ```go
 // Config defines the structure of the compliance checker configuration file.
@@ -150,7 +154,7 @@ rules:
               - match: arn:aws:kms:eu-west-1:123456789012:alias/staging-cicd
 ```
 
-## Output
+### Output
 
 To be as helpful as possible to user, the output should make it clear what the
 problem is. It should include information about:
@@ -164,12 +168,12 @@ problem is. It should include information about:
   check failed.
 - Optionally provide guidance how to make the file compliant with the rules.
 
-### Output formats
+#### Output formats
 
 The compliance checker should support at least textual output intended for
 display to users as well as machine readable output in the [SARIF format][sarif].
 
-## Non-Goals
+### Out of Scope
 
 The compliance checker only looks at the trust anchors found in the SOPS
 metadata without actually having access to the encryption keys. Because of
@@ -185,7 +189,7 @@ that:
   of other tools out there that already do this, such as [Gitleaks][gitleaks],
   [Secretlint][secretlint] or [TruffleHog][trufflehog].
 
-## Other considerations
+## Other Considerations
 
 There are some potential optional features that could be supported by the
 compliance checker:
