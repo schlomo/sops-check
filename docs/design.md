@@ -71,39 +71,83 @@ complex match pattern with different dependencies between each other.
 
 ### Data Model
 
-Based on the functional requirements, the data model for the rule configuration
-could look like this (expressed as Go code, the language used for the actual
-implementation might differ):
+Based on the functional requirements, the JSON schema for the rule
+configuration could look like this (in YAML for better readability):
 
-```go
-// Config defines the structure of the compliance checker configuration file.
-type Config struct {
-	// Rules for matching trust anchors in a SOPS file.
-	Rules []Rule `yaml:"rules"`
-}
-
-// Rule defines a single matching rule.
-type Rule struct {
-	// AnyOf asserts that one or more nested rules match.
-	AnyOf []Rule `yaml:"anyOf"`
-
-	// AllOf asserts that at least one of the nested rules matches.
-	AllOf []Rule `yaml:"allOf"`
-
-	// OneOf asserts that exactly one of the nested rules matches.
-	OneOf []Rule `yaml:"oneOf"`
-
-	// Not inverts the matching behaviour of a rule.
-	Not Rule `yaml:"not"`
-
-	// Match defines the pattern to match trust anchors against. Can be an
-	// exact string or a regular expression.
-	Match string `yaml:"match"`
-}
+```yaml
+---
+$schema: https://json-schema.org/draft-07/schema
+additionalProperties: false
+definitions:
+  allOfRule:
+    additionalProperties: false
+    description: Asserts that all of the nested rules match.
+    properties:
+      allOf:
+        $ref: '#/definitions/rules'
+    required:
+      - allOf
+    type: object
+  anyOfRule:
+    additionalProperties: false
+    description: Asserts that at least one of the nested rules matches.
+    properties:
+      anyOf:
+        $ref: '#/definitions/rules'
+    required:
+      - anyOf
+    type: object
+  matchRule:
+    additionalProperties: false
+    description: A rule for matching trust anchors.
+    properties:
+      match:
+        description: |
+          Defines the pattern to match trust anchors against. Can be an exact
+          string or a regular expression.
+        type: string
+    required:
+      - match
+    type: object
+  notRule:
+    additionalProperties: false
+    description: Inverts the matching behaviour of a rule.
+    properties:
+      not:
+        $ref: '#/definitions/rule'
+    required:
+      - not
+    type: object
+  oneOfRule:
+    additionalProperties: false
+    description: Asserts that exactly one of the nested rules matches.
+    properties:
+      oneOf:
+        $ref: '#/definitions/rules'
+    type: object
+  rule:
+    description: Defines single matching rule.
+    oneOf:
+      - $ref: '#/definitions/allOfRule'
+      - $ref: '#/definitions/anyOfRule'
+      - $ref: '#/definitions/matchRule'
+      - $ref: '#/definitions/notRule'
+      - $ref: '#/definitions/oneOfRule'
+  rules:
+    description: A list of matching rules.
+    items:
+      $ref: '#/definitions/rule'
+    type: array
+description: Schema of the sops-compliance-checker configuration file
+properties:
+  rules:
+    $ref: '#/definitions/rules'
+title: sops-compliance-checker configuration
+type: object
 ```
 
 This is highly influenced by the [JSON Schema Specification][jsonschema-spec]
-to allow for great flexibility in the rule composition.
+itself to allow for great flexibility in the rule composition.
 
 ### Configuration Example
 
