@@ -71,7 +71,7 @@ complex match pattern with different dependencies between each other.
 
 ### Data Model
 
-Based on the functional requirements, the JSON schema for the rule
+Based on the functional requirements, the [JSON schema][config-schema] for the rule
 configuration could look like this (in YAML for better readability):
 
 ```yaml
@@ -249,6 +249,7 @@ compliance checker:
 - **Matching n-of**: Support for matching lists of `m` trust anchors where `n`
   must match the rules, with `n <= m`.
 
+[config-schema]: ../schema.json
 [gitleaks]: https://github.com/gitleaks/gitleaks
 [jsonschema-spec]: https://json-schema.org/draft/2020-12/json-schema-core
 [sarif]: https://sarifweb.azurewebsites.net/
