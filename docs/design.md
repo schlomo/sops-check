@@ -258,6 +258,12 @@ compliance checker:
   management.
 - **Matching n-of**: Support for matching lists of `m` trust anchors where `n`
   must match the rules, with `n <= m`.
+- **Configuration extension**: Support for importing rules from existing
+  configuration files into another one.
+- **More rule metadata**: A rule configuration could carry more metadata like a
+  URL to internal documentation describing the rationale behind it. Other
+  options could be tags or keywords to enable better grouping of errors in the
+  output based on context.
 
 [config-schema]: ../schema.json
 [gitleaks]: https://github.com/gitleaks/gitleaks
