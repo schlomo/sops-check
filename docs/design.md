@@ -5,12 +5,21 @@ documents the functional and non-functional requirements we have, as well as
 the details about design decisions we took. It assumes familarity with
 [SOPS][sops] and the concepts that it uses.
 
+## Purpose
+
+Check SOPS files for correct and compliant usage without decrypting the SOPS
+files to ensure that all SOPS files are configured in the desired fashion. The
+goal is to provide a security linter that safeguards the security of the data
+protected by the SOPS files against common mistakes and against malicious
+configurations.
+
 ## Background
 
-SOPS supports encrypting files using one or more trust anchors. Especially in
-enterprise contexts, it is important to enforce some rules around the trust
-anchors that are in use. Some questions that to be answered could
-be:
+SOPS supports encrypting files using one or more "trust anchors" (the
+encryption keys used to encrypt a SOPS file). The security of the SOPS file is
+primarily governed by the security and selection of suitable. Especially in
+enterprise contexts it is important to enforce some rules around the trust
+anchors that are in use. Some questions that to be answered could be:
 
 - How can we ensure that any given SOPS file is encrypted using a set of
   required trust anchors?
@@ -37,8 +46,10 @@ this:
 The rules engine needs to support the following functionality:
 
 - Matching of a trust anchor ("match")
-  - **Example**: The trust anchor is an AWS KMS Key with the ARN
+  - **Example A**: The trust anchor is an AWS KMS Key with the ARN
     `arn:aws:kms:eu-west-1:123456789012:alias/my-team`.
+  - **Example B**: The trust anchor matches the regular expression
+    `^arn:aws:kms:eu-(central|west)-1:123456789012:.*$`.
 - Matching of all rules ("and" / "all of")
   - **Example**: The SOPS file must be encrypted with the AGE disaster recovery
     key as well as the keys of the owner of the file and the deploy key for the
@@ -154,14 +165,13 @@ itself to allow for great flexibility in the rule composition.
 Given the following requirements:
 
 - The SOPS file must contain all necessary approved trust anchors:
-  - AGE recovery key
-    `age1u79ltfzz5k79ex4mpl3r76p2532xex4mpl3z7vttctudr6gedn6ex4mpl3` used for
-    disaster recovery.
+  - AGE key `age1u79ltfzz5k79ex4mpl3r76p2532xex4mpl3z7vttctudr6gedn6ex4mpl3`
+    used for offline disaster recovery.
   - AWS KMS keys of **at least one team** owning the component. Additional team
     keys are allowed, as long as they are part of the list of approved trust
     anchors.
-  - AWS KMS deploy keys for **exactly one** target environment
-    (development/staging/production).
+  - AWS KMS keys used for deployment via CI/CD for **exactly one** target
+    environment (development/staging/production).
 - AWS KMS keys **must come in pairs** of two different regions to increase availability.
 - Any excess trust anchors not matching any of these rules **must be rejected**.
 

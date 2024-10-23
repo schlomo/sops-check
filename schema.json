@@ -33,7 +33,7 @@
       "description": "A rule for matching trust anchors.",
       "properties": {
         "match": {
-          "description": "Defines the pattern to match trust anchors against. Can be an exact\nstring or a regular expression.\n",
+          "description": "Defines the pattern to match trust anchors against. Can be an exact string or a regular expression.",
           "type": "string"
         }
       },
