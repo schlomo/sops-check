@@ -90,62 +90,51 @@ configuration could look like this (in YAML for better readability):
 $schema: https://json-schema.org/draft-07/schema
 additionalProperties: false
 definitions:
-  allOfRule:
+  rule:
     additionalProperties: false
-    description: Asserts that all of the nested rules match.
+    description: Defines a single matching rule.
+    oneOf:
+      - not:
+          required: [anyOf, match, not, oneOf]
+        required: [allOf]
+      - not:
+          required: [allOf, match, not, oneOf]
+        required: [anyOf]
+      - not:
+          required: [allOf, anyOf, not, oneOf]
+        required: [match]
+      - not:
+          required: [allOf, anyOf, match, oneOf]
+        required: [not]
+      - not:
+          required: [allOf, anyOf, match, not]
+        required: [oneOf]
     properties:
       allOf:
         $ref: '#/definitions/rules'
-    required:
-      - allOf
-    type: object
-  anyOfRule:
-    additionalProperties: false
-    description: Asserts that at least one of the nested rules matches.
-    properties:
+        description: Asserts that all of the nested rules match.
+      description:
+        description: Rule description displayed as context to the user.
+        type: string
       anyOf:
         $ref: '#/definitions/rules'
-    required:
-      - anyOf
-    type: object
-  matchRule:
-    additionalProperties: false
-    description: A rule for matching trust anchors.
-    properties:
+        description: Asserts that at least one of the nested rules matches.
       match:
-        description: |
+        description: >-
           Defines the pattern to match trust anchors against. Can be an exact
           string or a regular expression.
         type: string
-    required:
-      - match
-    type: object
-  notRule:
-    additionalProperties: false
-    description: Inverts the matching behaviour of a rule.
-    properties:
       not:
         $ref: '#/definitions/rule'
-    required:
-      - not
-    type: object
-  oneOfRule:
-    additionalProperties: false
-    description: Asserts that exactly one of the nested rules matches.
-    properties:
+        description: Inverts the matching behaviour of a rule.
       oneOf:
         $ref: '#/definitions/rules'
+        description: Asserts that exactly one of the nested rules matches.
+      url:
+        description: URL to documentation of the rule.
+        type: string
     type: object
-  rule:
-    description: Defines single matching rule.
-    oneOf:
-      - $ref: '#/definitions/allOfRule'
-      - $ref: '#/definitions/anyOfRule'
-      - $ref: '#/definitions/matchRule'
-      - $ref: '#/definitions/notRule'
-      - $ref: '#/definitions/oneOfRule'
   rules:
-    description: A list of matching rules.
     items:
       $ref: '#/definitions/rule'
     type: array
@@ -153,6 +142,7 @@ description: Schema of the sops-compliance-checker configuration file
 properties:
   rules:
     $ref: '#/definitions/rules'
+    description: A list of matching rules.
 title: sops-compliance-checker configuration
 type: object
 ```
@@ -183,29 +173,30 @@ rules:
   # All rules must match. This will automatically reject excess trust anchors
   # not matching any of the nested rules.
   - allOf:
-      # Disaster recovery key must be present.
-      - match: age1u79ltfzz5k79ex4mpl3r76p2532xex4mpl3z7vttctudr6gedn6ex4mpl3
-      # The AWS KMS key pair of at least one team must be present.
+      - description: Disaster recovery key must be present.
+        match: age1u79ltfzz5k79ex4mpl3r76p2532xex4mpl3z7vttctudr6gedn6ex4mpl3
       - anyOf:
-          # Regional keys of team-foo.
           - allOf:
               - match: arn:aws:kms:eu-central-1:123456789012:alias/team-foo
               - match: arn:aws:kms:eu-west-1:123456789012:alias/team-foo
-          # Regional keys of team-bar.
+            description: Regional keys of team-foo.
           - allOf:
               - match: arn:aws:kms:eu-central-1:123456789012:alias/team-bar
               - match: arn:aws:kms:eu-west-1:123456789012:alias/team-bar
-      # The AWS KMS key pair of exactly one deployment target environment must
-      # be present.
+            description: Regional keys of team-bar.
+        description: The AWS KMS key pair of at least one team must be present.
       - oneOf:
-          # Regional production keys.
           - allOf:
               - match: arn:aws:kms:eu-central-1:123456789012:alias/production-cicd
               - match: arn:aws:kms:eu-west-1:123456789012:alias/production-cicd
-          # Regional staging keys.
+            description: Regional production keys.
           - allOf:
               - match: arn:aws:kms:eu-central-1:123456789012:alias/staging-cicd
               - match: arn:aws:kms:eu-west-1:123456789012:alias/staging-cicd
+            description: Regional staging keys.
+        description: >-
+          The AWS KMS key pair of exactly one deployment target environment
+          must be present.
 ```
 
 ### Output
