@@ -1,0 +1,36 @@
+---
+project_name: sops-compliance-checker
+builds:
+  - main: main.go
+    binary: sops-compliance-checker
+    ldflags:
+      - -s -w
+        -X main.version={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    format: binary
+    files:
+      - none*
+release:
+  mode: keep-existing
+  github:
+    owner: Bonial-International-GmbH
+    name: sops-compliance-checker
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
