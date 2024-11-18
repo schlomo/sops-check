@@ -255,6 +255,12 @@ compliance checker:
   URL to internal documentation describing the rationale behind it. Other
   options could be tags or keywords to enable better grouping of errors in the
   output based on context.
+- **Different rules for different folders**: A rule should match only for specific paths.
+  This enables differentiated rules, for example ensure production AWS KMS keys for all
+  SOPS files in `/production/` while forbidding production AWS KMS keys for all other paths.
+  Need to think about different use cases and allow suitable mixing, for example to ensure
+  that the common AGE recovery key is present in all SOPS files, or that no PGP keys are used
+  in any SOPS file.
 
 [config-schema]: ../schema.json
 [gitleaks]: https://github.com/gitleaks/gitleaks
