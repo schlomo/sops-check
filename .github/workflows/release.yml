@@ -21,7 +21,7 @@ jobs:
         with:
           release-type: go
           bump-minor-pre-major: true
-          package-name: sops-compliance-checker
+          package-name: sops-check
           changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"chore","section":"Miscellaneous","hidden":false}]'
 
   publish-image:
@@ -31,7 +31,7 @@ jobs:
       packages: write
       contents: read
     env:
-      IMAGE_NAME: sops-compliance-checker
+      IMAGE_NAME: sops-check
       TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
     steps:
       - name: Checkout

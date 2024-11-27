@@ -1,8 +1,8 @@
 ---
-project_name: sops-compliance-checker
+project_name: sops-check
 builds:
   - main: main.go
-    binary: sops-compliance-checker
+    binary: sops-check
     ldflags:
       - -s -w
         -X main.version={{.Version}}
@@ -23,7 +23,7 @@ release:
   mode: keep-existing
   github:
     owner: Bonial-International-GmbH
-    name: sops-compliance-checker
+    name: sops-check
 checksum:
   name_template: 'checksums.txt'
 snapshot:
