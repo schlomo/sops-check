@@ -39,3 +39,7 @@ coverage: ## generate code coverage
 .PHONY: lint
 lint: ## run golangci-lint
 	golangci-lint run
+
+.PHONY: serve
+serve: ## serve documentation locally via mkdocs
+	mkdocs serve

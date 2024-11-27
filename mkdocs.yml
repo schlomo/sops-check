@@ -4,3 +4,4 @@ site_description: |
   and makes sure that they are configured in the desired fashion
 nav:
   - Design: design.md
+  - Glossary: glossary.md
