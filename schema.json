@@ -6,11 +6,40 @@
       "additionalProperties": false,
       "description": "Defines a single matching rule.",
       "oneOf": [
-        { "not": { "required": ["anyOf", "match", "not", "oneOf"] }, "required": ["allOf"] },
-        { "not": { "required": ["allOf", "match", "not", "oneOf"] }, "required": ["anyOf"] },
-        { "not": { "required": ["allOf", "anyOf", "not", "oneOf"] }, "required": ["match"] },
-        { "not": { "required": ["allOf", "anyOf", "match", "oneOf"] }, "required": ["not"] },
-        { "not": { "required": ["allOf", "anyOf", "match", "not"] }, "required": ["oneOf"] }
+        {
+          "not": {
+            "required": ["anyOf", "match", "matchRegex", "not", "oneOf"]
+          },
+          "required": ["allOf"]
+        },
+        {
+          "not": {
+            "required": ["allOf", "match", "matchRegex", "not", "oneOf"]
+          },
+          "required": ["anyOf"]
+        },
+        {
+          "not": {
+            "required": ["allOf", "anyOf", "matchRegex", "not", "oneOf"]
+          },
+          "required": ["match"]
+        },
+        {
+          "not": { "required": ["allOf", "anyOf", "match", "not", "oneOf"] },
+          "required": ["matchRegex"]
+        },
+        {
+          "not": {
+            "required": ["allOf", "anyOf", "match", "matchRegex", "oneOf"]
+          },
+          "required": ["not"]
+        },
+        {
+          "not": {
+            "required": ["allOf", "anyOf", "match", "matchRegex", "not"]
+          },
+          "required": ["oneOf"]
+        }
       ],
       "properties": {
         "allOf": {
@@ -26,7 +55,11 @@
           "description": "Asserts that at least one of the nested rules matches."
         },
         "match": {
-          "description": "Defines the pattern to match trust anchors against. Can be an exact string or a regular expression.",
+          "description": "Specifies a trust anchor that has to match exactly.",
+          "type": "string"
+        },
+        "matchRegex": {
+          "description": "Defines a regular expression to match trust anchors against.",
           "type": "string"
         },
         "not": {
@@ -51,13 +84,13 @@
       "type": "array"
     }
   },
-  "description": "Schema of the sops-compliance-checker configuration file",
+  "description": "Schema of the sops-check configuration file",
   "properties": {
     "rules": {
       "$ref": "#/definitions/rules",
       "description": "A list of matching rules."
     }
   },
-  "title": "sops-compliance-checker configuration",
+  "title": "sops-check configuration",
   "type": "object"
 }

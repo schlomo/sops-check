@@ -1,9 +1,9 @@
 # Design
 
-This document explains the purpose of the `sops-compliance-checker` and also
-documents the functional and non-functional requirements we have, as well as
-the details about design decisions we took. It assumes familarity with
-[SOPS][sops] and the concepts that it uses.
+This document explains the purpose of `sops-check` and also documents the
+functional and non-functional requirements we have, as well as the details
+about design decisions we took. It assumes familarity with [SOPS][sops] and the
+concepts that it uses.
 
 ## Purpose
 
@@ -27,9 +27,9 @@ anchors that are in use. Some questions that to be answered could be:
 - How can we prevent the usage of certain trust anchors in the presence of
   others (mutual exclusivity)?
 
-To answer these questions for any given SOPS file, the
-`sops-compliance-checker` needs to be flexible enough to process a set of
-user-defined rules which indicate success or failure.
+To answer these questions for any given SOPS file, `sops-check` needs to be
+flexible enough to process a set of user-defined rules which indicate success
+or failure.
 
 ## Functional Requirements
 
@@ -45,9 +45,10 @@ this:
 
 The rules engine needs to support the following functionality:
 
-- Matching of a trust anchor ("match")
+- Exact matching of a trust anchor ("match")
   - **Example A**: The trust anchor is an AWS KMS Key with the ARN
     `arn:aws:kms:eu-west-1:123456789012:alias/my-team`.
+- Matching of a trust anchor via regular expressions ("match regex")
   - **Example B**: The trust anchor matches the regular expression
     `^arn:aws:kms:eu-(central|west)-1:123456789012:.*$`.
 - Matching of all rules ("and" / "all of")
@@ -95,40 +96,44 @@ definitions:
     description: Defines a single matching rule.
     oneOf:
       - not:
-          required: [anyOf, match, not, oneOf]
+          required: [anyOf, match, matchRegex, not, oneOf]
         required: [allOf]
       - not:
-          required: [allOf, match, not, oneOf]
+          required: [allOf, match, matchRegex, not, oneOf]
         required: [anyOf]
       - not:
-          required: [allOf, anyOf, not, oneOf]
+          required: [allOf, anyOf, matchRegex, not, oneOf]
         required: [match]
       - not:
-          required: [allOf, anyOf, match, oneOf]
+          required: [allOf, anyOf, match, not, oneOf]
+        required: [matchRegex]
+      - not:
+          required: [allOf, anyOf, match, matchRegex, oneOf]
         required: [not]
       - not:
-          required: [allOf, anyOf, match, not]
+          required: [allOf, anyOf, match, matchRegex, not]
         required: [oneOf]
     properties:
       allOf:
-        $ref: '#/definitions/rules'
+        $ref: "#/definitions/rules"
         description: Asserts that all of the nested rules match.
       description:
         description: Rule description displayed as context to the user.
         type: string
       anyOf:
-        $ref: '#/definitions/rules'
+        $ref: "#/definitions/rules"
         description: Asserts that at least one of the nested rules matches.
       match:
-        description: >-
-          Defines the pattern to match trust anchors against. Can be an exact
-          string or a regular expression.
+        description: Specifies a trust anchor that has to match exactly.
+        type: string
+      matchRegex:
+        description: Defines a regular expression to match trust anchors against.
         type: string
       not:
-        $ref: '#/definitions/rule'
+        $ref: "#/definitions/rule"
         description: Inverts the matching behaviour of a rule.
       oneOf:
-        $ref: '#/definitions/rules'
+        $ref: "#/definitions/rules"
         description: Asserts that exactly one of the nested rules matches.
       url:
         description: URL to documentation of the rule.
@@ -136,14 +141,14 @@ definitions:
     type: object
   rules:
     items:
-      $ref: '#/definitions/rule'
+      $ref: "#/definitions/rule"
     type: array
-description: Schema of the sops-compliance-checker configuration file
+description: Schema of the sops-check configuration file
 properties:
   rules:
-    $ref: '#/definitions/rules'
+    $ref: "#/definitions/rules"
     description: A list of matching rules.
-title: sops-compliance-checker configuration
+title: sops-check configuration
 type: object
 ```
 
@@ -255,8 +260,14 @@ compliance checker:
   URL to internal documentation describing the rationale behind it. Other
   options could be tags or keywords to enable better grouping of errors in the
   output based on context.
+- **Different rules for different folders**: A rule should match only for specific paths.
+  This enables differentiated rules, for example ensure production AWS KMS keys for all
+  SOPS files in `/production/` while forbidding production AWS KMS keys for all other paths.
+  Need to think about different use cases and allow suitable mixing, for example to ensure
+  that the common AGE recovery key is present in all SOPS files, or that no PGP keys are used
+  in any SOPS file.
 
-[config-schema]: ../schema.json
+[config-schema]: schema.json
 [gitleaks]: https://github.com/gitleaks/gitleaks
 [jsonschema-spec]: https://json-schema.org/draft/2020-12/json-schema-core
 [sarif]: https://sarifweb.azurewebsites.net/
