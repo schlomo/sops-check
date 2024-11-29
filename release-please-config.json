@@ -2,7 +2,12 @@
   "bump-minor-pre-major": true,
   "packages": {
     ".": {
-      "exclude-paths": ["README.md", "catalog-info.yaml", "docs/", "mkdocs.yml"],
+      "exclude-paths": [
+        "README.md",
+        "catalog-info.yaml",
+        "docs/",
+        "mkdocs.yml"
+      ],
       "package-name": "sops-check"
     }
   },
