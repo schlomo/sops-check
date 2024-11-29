@@ -145,6 +145,10 @@ definitions:
     type: array
 description: Schema of the sops-check configuration file
 properties:
+  allowUnmatched:
+    default: false
+    description: Allow SOPS files to contain trust anchors that are not matched by any rule.
+    type: boolean
   rules:
     $ref: "#/definitions/rules"
     description: A list of matching rules.
@@ -267,7 +271,7 @@ compliance checker:
   that the common AGE recovery key is present in all SOPS files, or that no PGP keys are used
   in any SOPS file.
 
-[config-schema]: schema.json
+[config-schema]: https://github.com/Bonial-International-GmbH/sops-check/blob/main/schema.json
 [gitleaks]: https://github.com/gitleaks/gitleaks
 [jsonschema-spec]: https://json-schema.org/draft/2020-12/json-schema-core
 [sarif]: https://sarifweb.azurewebsites.net/
