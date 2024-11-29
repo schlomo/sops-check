@@ -5,7 +5,7 @@ builds:
     binary: sops-check
     ldflags:
       - -s -w
-        -X main.version={{.Version}}
+        -X github.com/Bonial-International-GmbH/sops-check/internal/cli.Version={{.Version}}
     env:
       - CGO_ENABLED=0
     goos:
