@@ -23,14 +23,10 @@ jobs:
       - name: Run release-please
         id: release-please
         uses: googleapis/release-please-action@v4
-        with:
-          release-type: go
-          bump-minor-pre-major: true
-          package-name: sops-check
-          changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"chore","section":"Miscellaneous","hidden":false}]'
 
   publish-image:
     needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
