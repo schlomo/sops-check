@@ -1,0 +1,36 @@
+---
+project_name: sops-check
+builds:
+  - main: main.go
+    binary: sops-check
+    ldflags:
+      - -s -w
+        -X github.com/Bonial-International-GmbH/sops-check/internal/cli.Version={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format: binary
+    files:
+      - none*
+release:
+  mode: keep-existing
+  github:
+    owner: Bonial-International-GmbH
+    name: sops-check
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
