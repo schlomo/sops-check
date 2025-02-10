@@ -13,6 +13,8 @@ type Args struct {
 	ConfigPath string
 	// SarifReportPath is the path where the SARIF report should be saved.
 	SarifReportPath string
+	// IgnoreFilePath is the path of the ignorefile.
+	IgnoreFilePath []string
 }
 
 // Defaults apply to arguments not provided explicitly.
@@ -41,6 +43,10 @@ func ParseArgs(commandLine []string) (*Args, error) {
 
 	app.Flag("sarif-report-path", "Path where the SARIF report should be created.").
 		StringVar(&args.SarifReportPath)
+
+	app.Flag("ignore-file", "Path to the ignorefile.").
+		Short('i').
+		StringsVar(&args.IgnoreFilePath)
 
 	// Positional arguments.
 	app.Arg("path", "Directory to run the checks in. If omitted, checks are run in the current working directory.").

@@ -9,22 +9,60 @@ import (
 	"github.com/getsops/sops/v3/age"
 	"github.com/getsops/sops/v3/keys"
 	"github.com/getsops/sops/v3/kms"
+	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidSopsFiles(t *testing.T) {
+func TestSingleIgnoreFile(t *testing.T) {
 	testDir := "testdata"
 
 	expectedResults := []File{
 		{Path: "testdata/valid_sops_files/encrypted.env", Metadata: sops.Metadata{}},
 		{Path: "testdata/valid_sops_files/encrypted.ini", Metadata: sops.Metadata{}},
-		{Path: "testdata/valid_sops_files/encrypted.yaml", Metadata: sops.Metadata{}},
-		{Path: "testdata/valid_sops_files/encrypted.yml", Metadata: sops.Metadata{}},
 		{Path: "testdata/valid_sops_files/encrypted.json", Metadata: sops.Metadata{}},
 	}
 
+	ignoreObject, err := ignore.CompileIgnoreFile(testDir + "/ignorefiles/.ymlignorefile")
+	if err != nil {
+		t.Errorf("Failed to process ignore file")
+	}
+
 	// Loop through files in the testdata directory.
-	files, err := FindFiles(testDir)
+	files, err := FindFiles(testDir, []*ignore.GitIgnore{ignoreObject})
+	assert.NoError(t, err)
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].Path < files[j].Path
+	})
+
+	sort.Slice(expectedResults, func(i, j int) bool {
+		return expectedResults[i].Path < expectedResults[j].Path
+	})
+
+	for i, file := range expectedResults {
+		assert.Equal(t, file.Path, files[i].Path)
+	}
+}
+
+func TestMultipleIgnoreFiles(t *testing.T) {
+	testDir := "testdata"
+
+	expectedResults := []File{
+		{Path: "testdata/valid_sops_files/encrypted.env", Metadata: sops.Metadata{}},
+		{Path: "testdata/valid_sops_files/encrypted.ini", Metadata: sops.Metadata{}},
+	}
+
+	ignoreObject1, err := ignore.CompileIgnoreFile(testDir + "/ignorefiles/.ymlignorefile")
+	if err != nil {
+		t.Errorf("Failed to process ignore file %s", testDir+"/ignorefiles/.ymlignorefile")
+	}
+	ignoreObject2, err := ignore.CompileIgnoreFile(testDir + "/ignorefiles/.jsonignorefile")
+	if err != nil {
+		t.Errorf("Failed to process ignore file %s", testDir+"/ignorefiles/.jsonignorefile")
+	}
+
+	// Loop through files in the testdata directory.
+	files, err := FindFiles(testDir, []*ignore.GitIgnore{ignoreObject1, ignoreObject2})
 	assert.NoError(t, err)
 
 	sort.Slice(files, func(i, j int) bool {
@@ -44,7 +82,7 @@ func TestInvalidSopsFiles(t *testing.T) {
 	testDir := "testdata/invalid_sops_files"
 
 	// Loop through files in the testdata directory.
-	files, err := FindFiles(testDir)
+	files, err := FindFiles(testDir, nil)
 	assert.NoError(t, err)
 	assert.Empty(t, files)
 }
