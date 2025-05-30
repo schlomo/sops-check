@@ -15,4 +15,4 @@ database:
     host: prod-db.example.com
     port: 5432
     username: prod_user
-    password: secret_password 
+    password: secret_password

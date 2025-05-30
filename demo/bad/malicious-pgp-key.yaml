@@ -9,4 +9,4 @@ sops:
       created_at: "2024-06-01T12:00:00Z"
   lastmodified: "2024-06-01T12:00:00Z"
   mac: "mac-placeholder"
-  version: 3.7.3 
+  version: 3.7.3

@@ -1,4 +1,3 @@
----
 # Global settings
 allowUnmatched: false  # Reject any trust anchors not explicitly allowed by rules
 
@@ -51,4 +50,4 @@ rules:
       # Only allow KMS keys from allowed regions, account, and alias pattern
       - matchRegex: "^arn:aws:kms:eu-(central|west)-1:123456789012:alias/(production|staging|development)-cicd$"
         description: "Only allow KMS keys from eu-central-1 or eu-west-1, account 123456789012, and alias ending with -cicd"
-        url: "https://internal-wiki/security/authorized-regions" 
+        url: "https://internal-wiki/security/authorized-regions"
